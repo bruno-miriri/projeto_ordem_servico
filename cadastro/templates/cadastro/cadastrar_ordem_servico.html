@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Ordem de Serviço</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #e8f5e9;
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 30px;
+        }
+
+        form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            background-color: #43a047;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: inline-block;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-style: italic;
+            color: #999;
+            font-weight: normal;
+        }
+
+        button {
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: #388e3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2e7d32;
+        }
+
+        .voltar-btn {
+            margin-top: 20px;
+            background-color: #c8e6c9;
+            color: #2e7d32;
+            border: 2px solid #81c784;
+        }
+
+        .voltar-btn:hover {
+            background-color: #a5d6a7;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .alert-success {
+            background-color: #4caf50;
+        }
+
+        .alert-error {
+            background-color: #f44336;
+        }
+    </style>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputFile = document.getElementById("id_imagem_situacao");
+        const fileNameDiv = document.getElementById("file-name");
+
+        inputFile.addEventListener("change", function () {
+            if (inputFile.files.length > 0) {
+                const nome = inputFile.files[0].name;
+                fileNameDiv.textContent = `📷 Arquivo selecionado: ${nome}`;
+                fileNameDiv.style.color = "#2e7d32";
+                fileNameDiv.style.fontWeight = "bold";
+            } else {
+                fileNameDiv.textContent = "Nenhum arquivo selecionado.";
+                fileNameDiv.style.color = "#999";
+                fileNameDiv.style.fontWeight = "normal";
+            }
+        });
+    });
+</script>
+
+</head>
+<body>
+
+    <img src="{% static 'logo.png' %}" alt="Logo da Empresa" class="logo">
+    <h1>Cadastro de Ordem de Serviço</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <label for="id_imagem_situacao" class="file-label">
+            <i class="fas fa-camera"></i> Selecionar Imagem
+        </label>
+        <input type="file" name="imagem_situacao" id="id_imagem_situacao" onchange="mostrarNomeArquivo(this)">
+        <div class="file-name" id="file-name">Nenhum arquivo selecionado.</div>
+
+        <br>
+        <button type="submit">Salvar</button>
+    </form>
+
+    <a href="{% url 'menu_principal' %}">
+        <button class="voltar-btn">Voltar ao Menu</button>
+    </a>
+
+</body>
+</html>

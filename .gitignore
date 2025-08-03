@@ -1,0 +1,39 @@
+# Arquivos Python
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.pyc
+
+# Ambientes virtuais
+venv/
+.env/
+
+# Arquivos de banco de dados locais (caso use SQLite)
+*.sqlite3
+
+# Arquivos do VS Code
+.vscode/
+
+# Pastas Django que não precisam estar no controle de versão
+/staticfiles/
+media/
+node_modules/
+
+# Pastas específicas do seu projeto
+cadastro/documentos_gerados/
+imagens_os/
+
+# Arquivos de configuração sensíveis
+.env
+
+# Arquivos de log
+*.log
+
+# Arquivos de backup
+*.bak
+*.swp
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

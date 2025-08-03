@@ -1,0 +1,221 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Cliente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            background-color: #e8f5e9;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 30px;
+        }
+
+        form {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .button-container {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            background-color: #43a047;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #388e3c;
+        }
+
+        .btn-back {
+            background-color: #757575;
+        }
+
+        .btn-back:hover {
+            background-color: #5f5f5f;
+        }
+
+        .alert {
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .alert-success {
+            background-color: #4caf50;
+        }
+
+        .alert-error {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="{% static 'logo.png' %}" alt="Logo da Miriri" class="logo">
+    <h1>Cadastro de Cliente</h1>
+
+    <!-- Mensagens Django -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Erros de formulário -->
+    {% if form.errors %}
+        <div class="alert alert-error">
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Formulário -->
+    <form method="POST">
+        {% csrf_token %}
+        <label for="id_empresa">Empresa</label>
+        {{ form.empresa }}
+
+        <label for="id_matricula">Matrícula</label>
+        {{ form.matricula }}
+
+        <label for="id_nome">Nome completo</label>
+        {{ form.nome }}
+
+        <label for="id_cpf">CPF</label>
+        {{ form.cpf }}
+
+        <label for="id_ugb">UGB</label>
+        {{ form.ugb }}
+
+        <label for="id_telefone">Telefone</label>
+        {{ form.telefone }}
+
+        <label for="id_email">E-mail</label>
+        {{ form.email }}
+
+        <div class="button-container">
+            <button type="submit" class="btn">Salvar</button>
+            <a href="{% url 'menu_principal' %}" class="btn btn-back">Voltar ao Menu</a>
+        </div>
+    </form>
+
+    <script>
+        $(document).ready(function () {
+            const matriculaField = $('#id_matricula');
+            const nomeField = $('#id_nome');
+            const cpfField = $('#id_cpf');
+            const telefoneInput = $('#id_telefone');
+
+            matriculaField.prop('disabled', true);
+
+            // Habilita matrícula ao escolher empresa
+            $('#id_empresa').change(function () {
+                const empresa = $(this).val();
+                if (empresa) {
+                    matriculaField.prop('disabled', false);
+                    nomeField.val('');
+                    cpfField.val('');
+                } else {
+                    matriculaField.prop('disabled', true);
+                }
+            });
+
+            // Consulta nome e CPF via AJAX ao perder foco da matrícula
+            matriculaField.blur(function () {
+                const matricula = $(this).val();
+                const empresa = $('#id_empresa').val();
+
+                if (matricula && empresa) {
+                    fetch(`/get-dados-cliente/?empresa=${empresa}&matricula=${matricula}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.sucesso) {
+                                nomeField.val(data.nome);
+                                cpfField.val(data.cpf_formatado);
+                            } else {
+                                alert(data.mensagem || "Funcionário não encontrado.");
+                                nomeField.val('');
+                                cpfField.val('');
+                            }
+                        });
+                }
+            });
+
+            // Máscara visual de telefone
+            function aplicarMascaraTelefone(valor) {
+                let limpo = valor.replace(/\D/g, '').slice(0, 11);
+                if (limpo.length < 3) return limpo;
+                if (limpo.length <= 6) return `(${limpo.slice(0, 2)}) ${limpo.slice(2)}`;
+                return `(${limpo.slice(0, 2)}) ${limpo.slice(2, 7)}-${limpo.slice(7)}`;
+            }
+
+            telefoneInput.on('input', function () {
+                this.value = aplicarMascaraTelefone(this.value);
+            });
+
+            telefoneInput.on('keypress', function (e) {
+                if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

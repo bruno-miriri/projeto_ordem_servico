@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Ordem de Serviço</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #e8f5e9;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 40px;
+        }
+
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .menu-button {
+            background-color: #43a047;
+            border: none;
+            color: white;
+            padding: 20px 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .menu-button i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .menu-button:hover {
+            background-color: #388e3c;
+        }
+
+        .menu-button.yellow {
+            background-color: #fbc02d;
+            color: #333;
+        }
+
+        .menu-button.yellow:hover {
+            background-color: #f9a825;
+        }
+
+        .menu-button.red {
+            background-color: #e53935;
+        }
+
+        .menu-button.red:hover {
+            background-color: #c62828;
+        }
+    </style>
+
+    <script>
+        function confirmarSaida() {
+            if (confirm("Tem certeza que deseja sair do sistema?")) {
+                window.open('', '_self', '');
+                window.close();
+
+                setTimeout(function () {
+                    alert("Se a aba não foi fechada automaticamente, feche-a manualmente.");
+                }, 300);
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <img src="{% static 'logo.png' %}" alt="Logo da Empresa" class="logo">
+
+    <h1>Bem-vindo ao Sistema de Ordem de Serviço</h1>
+
+    <div class="menu-container">
+        <a href="{% url 'cadastrar_area' %}" class="menu-button">
+            <i class="fas fa-sitemap"></i>
+            Cadastro de Área
+        </a>
+
+        <a href="{% url 'cadastrar_cliente' %}" class="menu-button">
+            <i class="fas fa-user"></i>
+            Cadastro de Cliente
+        </a>
+
+        <a href="{% url 'cadastrar_equipamento' %}" class="menu-button">
+            <i class="fas fa-laptop"></i>
+            Cadastro de Equipamento
+        </a>
+
+        <a href="{% url 'cadastrar_ordem_servico' %}" class="menu-button">
+            <i class="fas fa-file-alt"></i>
+            Cadastro de OS
+        </a>
+
+        <a href="{% url 'fechar_ordem_servico' %}" class="menu-button yellow">
+            <i class="fas fa-check-circle"></i>
+            Fechamento de OS
+        </a>
+
+        <a href="{% url 'registrar_baixa_equipamento' %}" class="menu-button yellow">
+            <i class="fas fa-box-open"></i>
+            Baixa de Equipamento
+        </a>
+
+        <!-- Botão de sair com confirmação -->
+        <a href="javascript:void(0);" onclick="confirmarSaida()" class="menu-button red">
+            <i class="fas fa-sign-out-alt"></i>
+            Sair
+        </a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Área</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #e8f5e9;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 30px;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #a5d6a7;
+            border-radius: 5px;
+        }
+
+        .btn-salvar {
+            background-color: #43a047;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn-salvar:hover {
+            background-color: #388e3c;
+        }
+
+        .btn-voltar {
+            display: inline-block;
+            margin-top: 15px;
+            color: #2e7d32;
+            text-decoration: none;
+        }
+
+        .mensagem {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .mensagem.sucesso {
+            background-color: #c8e6c9;
+            color: #256029;
+        }
+
+        .mensagem.erro {
+            background-color: #ffcdd2;
+            color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="{% static 'logo.png' %}" alt="Logo da Empresa" class="logo">
+
+    <h1>Cadastro de Área</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mensagem {% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="id_area">Nome da Área:</label>
+        {{ form.area }}
+
+        <label for="id_responsavel_area">Responsável:</label>
+        {{ form.responsavel_area }}
+
+        <button type="submit" class="btn-salvar">Salvar</button>
+    </form>
+
+    <a href="{% url 'menu_principal' %}" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Menu</a>
+
+</body>
+</html>

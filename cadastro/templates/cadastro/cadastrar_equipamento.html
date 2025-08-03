@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Equipamento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e8f5e9;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 30px;
+        }
+
+        form {
+            display: inline-block;
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #ccc;
+            text-align: left;
+            min-width: 400px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #2e7d32;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 5px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .form-error {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .form-actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button, .menu-button {
+            background-color: #43a047;
+            color: white;
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        button:hover, .menu-button:hover {
+            background-color: #388e3c;
+        }
+
+        .alert {
+            margin: 15px auto;
+            padding: 12px;
+            border-radius: 5px;
+            color: white;
+            max-width: 500px;
+        }
+
+        .alert-success {
+            background-color: #4caf50;
+        }
+
+        .alert-error {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="{% static 'logo.png' %}" alt="Logo da Miriri" class="logo">
+    <h1>Cadastro de Equipamento</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+                <div class="form-error">{{ field.errors.0 }}</div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit">Salvar</button>
+        </div>
+    </form>
+
+    <br>
+    <a href="{% url 'menu_principal' %}" class="menu-button">← Voltar ao Menu</a>
+
+</body>
+</html>
