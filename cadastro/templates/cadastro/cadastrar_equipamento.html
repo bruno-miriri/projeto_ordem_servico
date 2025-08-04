@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Cadastro de Equipamento</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
         body {
@@ -51,6 +52,10 @@
             border-radius: 6px;
         }
 
+        input.invalid {
+            border-color: #f44336;
+        }
+
         .form-error {
             color: red;
             font-size: 14px;
@@ -94,6 +99,13 @@
         .alert-error {
             background-color: #f44336;
         }
+
+        .mensagem-validacao {
+            color: #f44336;
+            font-size: 13px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -115,18 +127,53 @@
         {% for field in form %}
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             {{ field }}
+
+            {% if field.name == 'numero_serie' %}
+                <div id="mensagem-numero-serie" class="mensagem-validacao" style="display: none;">
+                    Número de série já cadastrado.
+                </div>
+            {% endif %}
+
             {% if field.errors %}
                 <div class="form-error">{{ field.errors.0 }}</div>
             {% endif %}
         {% endfor %}
 
         <div class="form-actions">
-            <button type="submit">Salvar</button>
+            <button type="submit" id="btn-salvar">Salvar</button>
         </div>
     </form>
 
     <br>
     <a href="{% url 'menu_principal' %}" class="menu-button">← Voltar ao Menu</a>
+
+    <script>
+        $(document).ready(function () {
+            const numeroSerieField = $('#id_numero_serie');
+            const mensagemSerie = $('#mensagem-numero-serie');
+            const botaoSalvar = $('#btn-salvar');
+
+            numeroSerieField.on('blur', function () {
+                const numeroSerie = numeroSerieField.val().trim();
+
+                if (numeroSerie) {
+                    fetch(`/verificar-numero-serie/?numero_serie=${encodeURIComponent(numeroSerie)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.existe) {
+                                numeroSerieField.addClass('invalid');
+                                mensagemSerie.show();
+                                botaoSalvar.attr('disabled', true);
+                            } else {
+                                numeroSerieField.removeClass('invalid');
+                                mensagemSerie.hide();
+                                botaoSalvar.removeAttr('disabled');
+                            }
+                        });
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>

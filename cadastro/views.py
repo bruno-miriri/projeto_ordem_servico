@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import AreaForm, ClienteForm, EquipamentoForm, OrdemServicoForm, FechamentoOSForm, BaixaEquipamentoForm
 from django.utils import timezone
-from .models import OrdemServico, Cliente
+from .models import OrdemServico, Cliente, Equipamento
 import os
 from django.conf import settings
 from django.contrib import messages
@@ -101,6 +101,15 @@ def cadastrar_cliente(request):
 
     return render(request, 'cadastro/cadastrar_cliente.html', {'form': form})
 
+def verificar_cliente_existente(request):
+    empresa = request.GET.get('empresa')
+    matricula = request.GET.get('matricula')
+
+    if empresa and matricula:
+        existe = Cliente.objects.filter(empresa=empresa, matricula=matricula).exists()
+        return JsonResponse({'existe': existe})
+    return JsonResponse({'existe': False})
+
 
 def cadastrar_equipamento(request):
     if request.method == 'POST':
@@ -116,12 +125,10 @@ def cadastrar_equipamento(request):
 
     return render(request, 'cadastro/cadastrar_equipamento.html', {'form': form})
 
-def verificar_cliente_existente(request):
-    empresa = request.GET.get('empresa')
-    matricula = request.GET.get('matricula')
-
-    if empresa and matricula:
-        existe = Cliente.objects.filter(empresa=empresa, matricula=matricula).exists()
+def verificar_numero_serie(request):
+    numero_serie = request.GET.get('numero_serie')
+    if numero_serie:
+        existe = Equipamento.objects.filter(numero_serie=numero_serie).exists()
         return JsonResponse({'existe': existe})
     return JsonResponse({'existe': False})
 
