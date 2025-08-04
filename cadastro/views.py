@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import AreaForm, ClienteForm, EquipamentoForm, OrdemServicoForm, FechamentoOSForm, BaixaEquipamentoForm
 from django.utils import timezone
-from .models import OrdemServico, BaixaEquipamento
+from .models import OrdemServico, Cliente
 import os
 from django.conf import settings
 from django.contrib import messages
@@ -82,8 +82,16 @@ from .forms import ClienteForm
 def cadastrar_cliente(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
+        empresa = request.POST.get('empresa')
+        matricula = request.POST.get('matricula')
+
+        # Verifica se já existe um cliente com a mesma matrícula e empresa
+        if Cliente.objects.filter(empresa=empresa, matricula=matricula).exists():
+            messages.error(request, 'Cliente já está cadastrado.')
+            return render(request, 'cadastro/cadastrar_cliente.html', {'form': form})
+
         if form.is_valid():
-            form.save()  # ← isso salva no banco de dados
+            form.save()
             messages.success(request, 'Cliente cadastrado com sucesso!')
             return redirect('cadastrar_cliente')
         else:
@@ -107,6 +115,15 @@ def cadastrar_equipamento(request):
         form = EquipamentoForm()
 
     return render(request, 'cadastro/cadastrar_equipamento.html', {'form': form})
+
+def verificar_cliente_existente(request):
+    empresa = request.GET.get('empresa')
+    matricula = request.GET.get('matricula')
+
+    if empresa and matricula:
+        existe = Cliente.objects.filter(empresa=empresa, matricula=matricula).exists()
+        return JsonResponse({'existe': existe})
+    return JsonResponse({'existe': False})
 
 def cadastrar_ordem_servico(request):
     if request.method == 'POST':

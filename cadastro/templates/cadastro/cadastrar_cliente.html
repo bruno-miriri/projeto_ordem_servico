@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <title>Cadastro de Cliente</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
@@ -51,6 +49,17 @@
             border: 1px solid #ccc;
         }
 
+        input.invalid {
+            border-color: #f44336;
+        }
+
+        .mensagem-validacao {
+            color: #f44336;
+            font-size: 13px;
+            text-align: left;
+            margin-top: 5px;
+        }
+
         .button-container {
             margin-top: 30px;
             display: flex;
@@ -82,10 +91,11 @@
         }
 
         .alert {
-            margin: 15px 0;
+            margin: 15px auto;
             padding: 12px;
             border-radius: 5px;
             color: white;
+            max-width: 600px;
         }
 
         .alert-success {
@@ -102,14 +112,12 @@
     <img src="{% static 'logo.png' %}" alt="Logo da Miriri" class="logo">
     <h1>Cadastro de Cliente</h1>
 
-    <!-- Mensagens Django -->
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">{{ message }}</div>
         {% endfor %}
     {% endif %}
 
-    <!-- Erros de formulário -->
     {% if form.errors %}
         <div class="alert alert-error">
             <ul>
@@ -125,7 +133,10 @@
         </div>
     {% endif %}
 
-    <!-- Formulário -->
+    <div id="alerta-cliente-existente" class="alert alert-error" style="display: none;">
+        Cliente já está cadastrado.
+    </div>
+
     <form method="POST">
         {% csrf_token %}
         <label for="id_empresa">Empresa</label>
@@ -133,6 +144,10 @@
 
         <label for="id_matricula">Matrícula</label>
         {{ form.matricula }}
+
+        <div id="mensagem-matricula" class="mensagem-validacao" style="display: none;">
+            Cliente já está cadastrado.
+        </div>
 
         <label for="id_nome">Nome completo</label>
         {{ form.nome }}
@@ -150,7 +165,7 @@
         {{ form.email }}
 
         <div class="button-container">
-            <button type="submit" class="btn">Salvar</button>
+            <button type="submit" class="btn" id="btn-salvar">Salvar</button>
             <a href="{% url 'menu_principal' %}" class="btn btn-back">Voltar ao Menu</a>
         </div>
     </form>
@@ -158,30 +173,52 @@
     <script>
         $(document).ready(function () {
             const matriculaField = $('#id_matricula');
+            const empresaField = $('#id_empresa');
             const nomeField = $('#id_nome');
             const cpfField = $('#id_cpf');
             const telefoneInput = $('#id_telefone');
+            const alertaExistente = $('#alerta-cliente-existente');
+            const mensagemMatricula = $('#mensagem-matricula');
+            const botaoSalvar = $('#btn-salvar');
 
             matriculaField.prop('disabled', true);
 
-            // Habilita matrícula ao escolher empresa
-            $('#id_empresa').change(function () {
+            empresaField.change(function () {
                 const empresa = $(this).val();
                 if (empresa) {
                     matriculaField.prop('disabled', false);
                     nomeField.val('');
                     cpfField.val('');
+                    alertaExistente.hide();
+                    mensagemMatricula.hide();
+                    botaoSalvar.removeAttr('disabled');
+                    matriculaField.removeClass('invalid');
                 } else {
                     matriculaField.prop('disabled', true);
                 }
             });
 
-            // Consulta nome e CPF via AJAX ao perder foco da matrícula
             matriculaField.blur(function () {
-                const matricula = $(this).val();
-                const empresa = $('#id_empresa').val();
+                const matricula = matriculaField.val();
+                const empresa = empresaField.val();
 
                 if (matricula && empresa) {
+                    fetch(`/verificar-cliente/?empresa=${empresa}&matricula=${matricula}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.existe) {
+                                alertaExistente.show();
+                                mensagemMatricula.show();
+                                matriculaField.addClass('invalid');
+                                botaoSalvar.attr('disabled', true);
+                            } else {
+                                alertaExistente.hide();
+                                mensagemMatricula.hide();
+                                matriculaField.removeClass('invalid');
+                                botaoSalvar.removeAttr('disabled');
+                            }
+                        });
+
                     fetch(`/get-dados-cliente/?empresa=${empresa}&matricula=${matricula}`)
                         .then(response => response.json())
                         .then(data => {
@@ -197,7 +234,6 @@
                 }
             });
 
-            // Máscara visual de telefone
             function aplicarMascaraTelefone(valor) {
                 let limpo = valor.replace(/\D/g, '').slice(0, 11);
                 if (limpo.length < 3) return limpo;

@@ -10,4 +10,5 @@ urlpatterns = [
     path('fechar-os/', views.fechar_ordem_servico, name='fechar_ordem_servico'),
     path('get-dados-cliente/', views.get_dados_cliente, name='get_dados_cliente'),
     path('registrar-baixa/', views.registrar_baixa_equipamento, name='registrar_baixa_equipamento'),
+    path('verificar-cliente/', views.verificar_cliente_existente, name='verificar_cliente'),
 ]
