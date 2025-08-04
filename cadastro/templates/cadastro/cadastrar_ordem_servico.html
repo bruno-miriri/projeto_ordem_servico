@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
         body {
@@ -76,8 +77,13 @@
             font-weight: normal;
         }
 
-        button {
+        .form-actions {
+            text-align: center;
             margin-top: 30px;
+        }
+
+        .btn {
+            margin-top: 20px;
             padding: 12px 25px;
             background-color: #388e3c;
             color: white;
@@ -87,18 +93,27 @@
             cursor: pointer;
         }
 
-        button:hover {
+        .btn:hover {
             background-color: #2e7d32;
         }
 
-        .voltar-btn {
+        .btn-back {
+            display: inline-block;
             margin-top: 20px;
-            background-color: #c8e6c9;
+            background-color: #757575;
             color: #2e7d32;
             border: 2px solid #81c784;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
         }
 
-        .voltar-btn:hover {
+        .btn-back i {
+            margin-right: 6px;
+        }
+
+        .btn-back:hover {
             background-color: #a5d6a7;
         }
 
@@ -136,8 +151,7 @@
             }
         });
     });
-</script>
-
+    </script>
 </head>
 <body>
 
@@ -156,18 +170,19 @@
         {% csrf_token %}
         {{ form.as_p }}
 
-        <label for="id_imagem_situacao" class="file-label">
-            <i class="fas fa-camera"></i> Selecionar Imagem
-        </label>
-        <input type="file" name="imagem_situacao" id="id_imagem_situacao" onchange="mostrarNomeArquivo(this)">
-        <div class="file-name" id="file-name">Nenhum arquivo selecionado.</div>
+        <div class="form-actions">
+            <label for="id_imagem_situacao" class="file-label">
+                <i class="fas fa-camera"></i> Selecionar Imagem
+            </label>
+            <input type="file" name="imagem_situacao" id="id_imagem_situacao">
+            <div class="file-name" id="file-name">Nenhum arquivo selecionado.</div>
 
-        <br>
-        <button type="submit">Salvar</button>
+            <button type="submit" class="btn">Salvar</button>
+        </div>
     </form>
 
-    <a href="{% url 'menu_principal' %}">
-        <button class="voltar-btn">Voltar ao Menu</button>
+    <a href="{% url 'menu_principal' %}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Voltar ao Menu
     </a>
 
 </body>

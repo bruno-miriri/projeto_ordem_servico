@@ -6,6 +6,7 @@
     <title>Cadastro de Equipamento</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         body {
@@ -67,21 +68,29 @@
             margin-top: 20px;
         }
 
-        button, .menu-button {
+        .btn {
             background-color: #43a047;
             color: white;
-            padding: 10px 25px;
+            padding: 12px 25px;
             font-size: 16px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #388e3c;
+        }
+
+        .btn-back {
+            background-color: #757575;
             margin-top: 15px;
         }
 
-        button:hover, .menu-button:hover {
-            background-color: #388e3c;
+        .btn-back:hover {
+            background-color: #5f5f5f;
         }
 
         .alert {
@@ -140,12 +149,14 @@
         {% endfor %}
 
         <div class="form-actions">
-            <button type="submit" id="btn-salvar">Salvar</button>
+            <button type="submit" class="btn" id="btn-salvar">Salvar</button>
         </div>
     </form>
 
     <br>
-    <a href="{% url 'menu_principal' %}" class="menu-button">← Voltar ao Menu</a>
+    <a href="{% url 'menu_principal' %}" class="btn btn-back">
+        <i class="fas fa-arrow-left"></i> Voltar ao Menu
+    </a>
 
     <script>
         $(document).ready(function () {
