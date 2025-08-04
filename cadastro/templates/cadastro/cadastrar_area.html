@@ -18,7 +18,7 @@
             margin-bottom: 20px;
         }
 
-        h1 {
+        h1, h2 {
             color: #2e7d32;
             margin-bottom: 30px;
         }
@@ -27,13 +27,26 @@
             background-color: #ffffff;
             padding: 30px;
             border-radius: 10px;
-            max-width: 500px;
+            max-width: 700px;
             margin: 0 auto;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
+        .form-horizontal {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 250px;
+        }
+
         label {
-            display: block;
             text-align: left;
             margin-bottom: 5px;
             font-weight: bold;
@@ -41,9 +54,7 @@
         }
 
         input[type="text"] {
-            width: 100%;
             padding: 10px;
-            margin-bottom: 20px;
             border: 2px solid #a5d6a7;
             border-radius: 5px;
         }
@@ -56,6 +67,7 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            margin-top: 20px;
         }
 
         .btn-salvar:hover {
@@ -85,6 +97,28 @@
             background-color: #ffcdd2;
             color: #b71c1c;
         }
+
+        table {
+            margin: 50px auto 0 auto;
+            background-color: #ffffff;
+            border-collapse: collapse;
+            width: 80%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #a5d6a7;
+            color: #2e7d32;
+        }
+
+        td {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -103,16 +137,46 @@
 
     <form method="POST">
         {% csrf_token %}
-        <label for="id_area">Nome da Área:</label>
-        {{ form.area }}
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label for="id_area">Nome da Área:</label>
+                {{ form.area }}
+            </div>
 
-        <label for="id_responsavel_area">Responsável:</label>
-        {{ form.responsavel_area }}
+            <div class="form-group">
+                <label for="id_responsavel_area">Responsável:</label>
+                {{ form.responsavel_area }}
+            </div>
+        </div>
 
         <button type="submit" class="btn-salvar">Salvar</button>
     </form>
 
-    <a href="{% url 'menu_principal' %}" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Menu</a>
+    <a href="{% url 'menu_principal' %}" class="btn-voltar">
+        <i class="fas fa-arrow-left"></i> Voltar ao Menu
+    </a>
+
+    {% if areas %}
+        <h2>Áreas Cadastradas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome da Área</th>
+                    <th>Responsável</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for area in areas %}
+                <tr>
+                    <td>{{ area.area }}</td>
+                    <td>{{ area.responsavel_area }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h2>Nenhuma área cadastrada ainda.</h2>
+    {% endif %}
 
 </body>
 </html>

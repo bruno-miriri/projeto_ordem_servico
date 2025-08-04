@@ -57,6 +57,8 @@ def get_dados_cliente(request):
 def menu_principal(request):
     return render(request, 'menu.html')
 
+from .models import Area  # certifique-se de importar o model
+
 def cadastrar_area(request):
     if request.method == 'POST':
         form = AreaForm(request.POST)
@@ -66,8 +68,12 @@ def cadastrar_area(request):
             return redirect('cadastrar_area')
     else:
         form = AreaForm()
-    
-    return render(request, 'cadastro/cadastrar_area.html', {'form': form})
+
+    # 👇 Aqui busca todas as áreas para exibir na lista
+    areas = Area.objects.all().order_by('area')
+
+    return render(request, 'cadastro/cadastrar_area.html', {'form': form, 'areas': areas})
+
 
 from django.contrib import messages
 from django.shortcuts import render, redirect
