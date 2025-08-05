@@ -14,4 +14,5 @@ urlpatterns = [
     path('verificar-numero-serie/', views.verificar_numero_serie, name='verificar_numero_serie'),
     path('download-termo-entrega/<int:os_id>/', views.download_termo_entrega, name='download_termo_entrega'),
     path('baixar-autorizacao-desconto/<int:os_id>/', views.baixar_autorizacao_desconto, name='baixar_autorizacao_desconto'),
+    path('baixar-termo-baixa/<int:cliente_id>/<int:equipamento_id>/', views.baixar_termo_baixa, name='baixar_termo_baixa'),
 ]

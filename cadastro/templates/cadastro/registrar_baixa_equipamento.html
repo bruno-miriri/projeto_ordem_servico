@@ -89,12 +89,51 @@
         .btn-back i {
             margin-right: 6px;
         }
+
+        .alert {
+    margin: 20px auto;
+    padding: 12px;
+    max-width: 600px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+}
+
+.alert-error {
+    background-color: #ffcdd2;
+    color: #b71c1c;
+}
+
+
+
     </style>
 </head>
 <body>
 
     <img src="{% static 'logo.png' %}" alt="Logo Miriri" class="logo">
     <h1>Registrar Baixa de Equipamento</h1>
+
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if exibe_botao_download %}
+    <div class="form-actions">
+        <a href="{% url 'baixar_termo_baixa' cliente.id equipamento.id %}" class="btn" target="_blank">
+            <i class="fas fa-download"></i> Baixar Termo de Baixa
+        </a>
+    </div>
+{% endif %}
+
 
     <form method="post">
         {% csrf_token %}

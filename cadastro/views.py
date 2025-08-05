@@ -291,13 +291,64 @@ def registrar_baixa_equipamento(request):
         form = BaixaEquipamentoForm(request.POST)
         if form.is_valid():
             baixa = form.save()
-            return gerar_termo_baixa(baixa.cliente, baixa.equipamento, baixa.motivo)
+
+            # Redireciona com os dados via GET
+            base_url = reverse('registrar_baixa_equipamento')
+            query_string = urlencode({
+                'cliente_id': baixa.cliente.id,
+                'equipamento_id': baixa.equipamento.id,
+                'baixado': 1
+            })
+            return HttpResponseRedirect(f"{base_url}?{query_string}")
         else:
             messages.error(request, 'Erro ao registrar a baixa. Verifique os dados informados.')
     else:
         form = BaixaEquipamentoForm()
 
-    return render(request, 'cadastro/registrar_baixa_equipamento.html', {'form': form})
+    cliente = equipamento = None
+    motivo = ""
+    exibe_botao_download = False
+
+    if request.GET.get('baixado') == '1':
+        try:
+            cliente_id = int(request.GET.get('cliente_id'))
+            equipamento_id = int(request.GET.get('equipamento_id'))
+            cliente = Cliente.objects.get(id=cliente_id)
+            equipamento = Equipamento.objects.get(id=equipamento_id)
+
+            # Busca o motivo mais recente dessa combinação
+            from .models import BaixaEquipamento
+            ultima_baixa = BaixaEquipamento.objects.filter(
+                cliente=cliente,
+                equipamento=equipamento
+            ).order_by('-data_baixa').first()
+
+            motivo = ultima_baixa.motivo if ultima_baixa else "Motivo não especificado"
+            messages.success(request, f"Baixa registrada para o equipamento '{equipamento.modelo}' de {cliente.nome}.")
+            exibe_botao_download = True
+        except Exception:
+            messages.warning(request, 'Baixa registrada, mas não foi possível exibir os dados para o termo.')
+
+    return render(request, 'cadastro/registrar_baixa_equipamento.html', {
+        'form': form,
+        'cliente': cliente,
+        'equipamento': equipamento,
+        'motivo': motivo,
+        'exibe_botao_download': exibe_botao_download
+    })
+
+def baixar_termo_baixa(request, cliente_id, equipamento_id):
+    cliente = get_object_or_404(Cliente, id=cliente_id)
+    equipamento = get_object_or_404(Equipamento, id=equipamento_id)
+
+    from .models import BaixaEquipamento
+    baixa = BaixaEquipamento.objects.filter(cliente=cliente, equipamento=equipamento).order_by('-data_baixa').first()
+
+    if not baixa:
+        messages.error(request, 'Registro de baixa não encontrado.')
+        return redirect('registrar_baixa_equipamento')
+
+    return gerar_termo_baixa(cliente, equipamento, baixa.motivo)
 
 
 def gerar_termo_baixa(cliente, equipamento, motivo):
