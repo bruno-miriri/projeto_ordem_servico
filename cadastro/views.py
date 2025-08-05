@@ -163,15 +163,30 @@ def cadastrar_ordem_servico(request):
                 cursor.execute("SELECT LAST_INSERT_ID();")
                 os_id = cursor.fetchone()[0]
 
-            messages.success(request, 'Ordem de Serviço cadastrada com sucesso!')
-            return redirect('download_termo_entrega', os_id=os_id)
+            # Redireciona com parâmetros via GET
+            base_url = reverse('cadastrar_ordem_servico')
+            query_string = urlencode({
+                'os_id': os_id,
+                'cadastro': 1
+            })
+            return HttpResponseRedirect(f"{base_url}?{query_string}")
 
         else:
             messages.error(request, 'Erro ao cadastrar OS. Verifique os dados.')
     else:
         form = OrdemServicoForm()
 
-    return render(request, 'cadastro/cadastrar_ordem_servico.html', {'form': form})
+    os_id = request.GET.get('os_id')
+    exibe_botao = request.GET.get('cadastro') == '1'
+
+    if exibe_botao and os_id:
+        messages.success(request, 'Ordem de Serviço cadastrada com sucesso!')
+
+    return render(request, 'cadastro/cadastrar_ordem_servico.html', {
+        'form': form,
+        'os_id': os_id,
+        'exibe_botao_download': exibe_botao
+    })
 
 
 def download_termo_entrega(request, os_id):
