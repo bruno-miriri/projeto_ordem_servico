@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Baixa de Equipamento</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         body {
@@ -50,33 +51,43 @@
             box-sizing: border-box;
         }
 
-        button {
+        .form-actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
             background-color: #43a047;
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 12px 25px;
             font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            text-decoration: none;
+            margin-top: 10px;
         }
 
-        button:hover {
+        .btn:hover {
             background-color: #388e3c;
         }
 
-        .voltar {
+        .btn-back {
+            background-color: #757575;
+            color: white;
             display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
             margin-top: 20px;
             text-decoration: none;
-            background-color: #cfd8dc;
-            color: #333;
-            padding: 10px 18px;
-            border-radius: 8px;
         }
 
-        .voltar:hover {
-            background-color: #b0bec5;
+        .btn-back:hover {
+            background-color: #5f5f5f;
+        }
+
+        .btn-back i {
+            margin-right: 6px;
         }
     </style>
 </head>
@@ -89,10 +100,14 @@
         {% csrf_token %}
         {{ form.as_p }}
 
-        <button type="submit">Salvar Baixa</button>
+        <div class="form-actions">
+            <button type="submit" class="btn">Salvar Baixa</button>
+        </div>
     </form>
 
-    <a href="{% url 'menu_principal' %}" class="voltar">Voltar ao Menu</a>
+    <a href="{% url 'menu_principal' %}" class="btn-back">
+        <i class="fas fa-arrow-left"></i> Voltar ao Menu
+    </a>
 
 </body>
 </html>

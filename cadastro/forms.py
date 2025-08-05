@@ -118,31 +118,45 @@ class FechamentoOSForm(forms.Form):
         label='Selecione a OS',
         required=True
     )
+
+    possui_valor = forms.ChoiceField(
+        label='Possui valor?',
+        choices=[('nao', 'Não'), ('sim', 'Sim')],
+        initial='nao',
+        widget=forms.Select()
+    )
+
     valor = forms.DecimalField(
         label='Valor do Serviço (R$)',
         min_value=0,
         decimal_places=2,
-        max_digits=10
+        max_digits=10,
+        required=False
+    )
+
+    parcelas = forms.IntegerField(
+        label='Número de Parcelas',
+        min_value=1,
+        required=False
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['os'].label_from_instance = lambda obj: (
-            f"OS {obj.id} - {obj.cliente.nome} - {obj.equipamento.modelo} ({obj.equipamento.responsavel})"
-        )
-    os = forms.ModelChoiceField(
-        queryset=OrdemServico.objects.filter(status='aberta'),
-        label='Selecione a OS',
-        required=True
-    )
-    valor = forms.DecimalField(min_value=0, decimal_places=2, label='Valor do Serviço')
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Personaliza a forma como cada OS será exibida no select
         self.fields['os'].label_from_instance = lambda obj: (
             f"{obj.id} - {obj.equipamento.modelo} - {obj.equipamento.responsavel}"
         )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        possui_valor = cleaned_data.get('possui_valor')
+        valor = cleaned_data.get('valor')
+        parcelas = cleaned_data.get('parcelas')
+
+        if possui_valor == 'sim':
+            if valor is None or valor <= 0:
+                self.add_error('valor', 'Informe um valor válido para a OS.')
+            if not parcelas:
+                self.add_error('parcelas', 'Informe o número de parcelas.')
 
 class BaixaEquipamentoForm(forms.ModelForm):
     class Meta:

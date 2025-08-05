@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <title>Fechamento de Ordem de Serviço</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -67,13 +65,13 @@
         }
 
         .btn {
-            padding: 12px 30px;
+            padding: 12px 25px;
             font-size: 16px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            text-align: center;
-            margin: 0 10px;
+            margin: 10px 10px 0;
+            text-decoration: none;
         }
 
         .btn-green {
@@ -85,13 +83,17 @@
             background-color: #388e3c;
         }
 
-        .btn-gray {
-            background-color: #9e9e9e;
+        .btn-back {
+            background-color: #757575;
             color: white;
         }
 
-        .btn-gray:hover {
-            background-color: #757575;
+        .btn-back:hover {
+            background-color: #5f5f5f;
+        }
+
+        .btn-back i {
+            margin-right: 6px;
         }
 
         .alert {
@@ -111,6 +113,10 @@
         .alert-error {
             background-color: #ffcdd2;
             color: #b71c1c;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -132,20 +138,87 @@
         <form method="post">
             {% csrf_token %}
 
-            {% for field in form %}
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <div class="errorlist">{{ field.errors }}</div>
+            <!-- Campo de seleção da OS -->
+            <label for="{{ form.os.id_for_label }}">{{ form.os.label }}</label>
+            {{ form.os }}
+            {% if form.os.errors %}
+                <div class="errorlist">{{ form.os.errors }}</div>
+            {% endif %}
+
+            <!-- Campo de seleção se possui valor -->
+            <label for="possui_valor">Possui valor?</label>
+            <select name="possui_valor" id="possui_valor">
+                <option value="nao" selected>Não</option>
+                <option value="sim">Sim</option>
+            </select>
+
+            <!-- Campo de valor (escondido inicialmente) -->
+            <div id="campo_valor" class="hidden">
+                <label for="{{ form.valor.id_for_label }}">{{ form.valor.label }}</label>
+                {{ form.valor }}
+                {% if form.valor.errors %}
+                    <div class="errorlist">{{ form.valor.errors }}</div>
                 {% endif %}
-            {% endfor %}
+            </div>
+
+            <!-- Campo de parcelas (escondido inicialmente) -->
+            <div id="campo_parcelas" class="hidden">
+                <label for="{{ form.parcelas.id_for_label }}">{{ form.parcelas.label }}</label>
+                {{ form.parcelas }}
+                {% if form.parcelas.errors %}
+                    <div class="errorlist">{{ form.parcelas.errors }}</div>
+                {% endif %}
+            </div>
 
             <div class="button-container">
                 <button type="submit" class="btn btn-green">Salvar</button>
-                <a href="{% url 'menu_principal' %}" class="btn btn-gray">Voltar ao Menu</a>
+                <a href="{% url 'menu_principal' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i> Voltar ao Menu
+                </a>
             </div>
         </form>
+
+        {% if exibe_botao_download and os_id_fechada %}
+            <div class="button-container">
+                <a href="{% url 'baixar_autorizacao_desconto' os_id_fechada %}" class="btn btn-green">
+                    <i class="fas fa-file-download"></i> Baixar Autorização de Desconto
+                </a>
+            </div>
+        {% endif %}
     </div>
+
+    <script>
+        const selectPossuiValor = document.getElementById('possui_valor');
+        const campoValor = document.getElementById('campo_valor');
+        const campoParcelas = document.getElementById('campo_parcelas');
+        const valorInput = document.getElementById('id_valor');
+
+        function atualizarCampos() {
+            if (selectPossuiValor.value === 'sim') {
+                campoValor.classList.remove('hidden');
+                if (parseFloat(valorInput.value.replace(',', '.')) > 0) {
+                    campoParcelas.classList.remove('hidden');
+                }
+            } else {
+                campoValor.classList.add('hidden');
+                campoParcelas.classList.add('hidden');
+                valorInput.value = '';
+            }
+        }
+
+        selectPossuiValor.addEventListener('change', atualizarCampos);
+
+        valorInput.addEventListener('input', function () {
+            const valor = parseFloat(this.value.replace(',', '.'));
+            if (!isNaN(valor) && valor > 0) {
+                campoParcelas.classList.remove('hidden');
+            } else {
+                campoParcelas.classList.add('hidden');
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', atualizarCampos);
+    </script>
 
 </body>
 </html>

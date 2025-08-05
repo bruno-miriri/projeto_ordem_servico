@@ -18,9 +18,15 @@
             margin-bottom: 20px;
         }
 
-        h1, h2 {
+        h1 {
             color: #2e7d32;
             margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #2e7d32;
+            margin-top: 60px; /* separação maior */
+            margin-bottom: 20px;
         }
 
         form {
@@ -74,27 +80,22 @@
             background-color: #388e3c;
         }
 
-        .btn {
-            background-color: #43a047;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            background-color: #388e3c;
-        }
-
         .btn-back {
             background-color: #757575;
+            color: white;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-decoration: none;
         }
 
         .btn-back:hover {
             background-color: #5f5f5f;
+        }
+
+        .btn-back i {
+            margin-right: 6px;
         }
 
         .mensagem {
@@ -114,11 +115,17 @@
             color: #b71c1c;
         }
 
+        .tabela-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 0 auto;
+            width: 80%;
+        }
+
         table {
-            margin: 50px auto 0 auto;
             background-color: #ffffff;
             border-collapse: collapse;
-            width: 80%;
+            width: 100%;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
@@ -168,30 +175,32 @@
         <button type="submit" class="btn-salvar">Salvar</button>
     </form>
 
-    <a href="{% url 'menu_principal' %}" class="btn btn-back">
+    <a href="{% url 'menu_principal' %}" class="btn-back">
         <i class="fas fa-arrow-left"></i> Voltar ao Menu
     </a>
 
     {% if areas %}
         <h2>Áreas Cadastradas</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nome da Área</th>
-                    <th>Responsável</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for area in areas %}
-                <tr>
-                    <td>{{ area.area }}</td>
-                    <td>{{ area.responsavel_area }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="tabela-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome da Área</th>
+                        <th>Responsável</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for area in areas %}
+                    <tr>
+                        <td>{{ area.area }}</td>
+                        <td>{{ area.responsavel_area }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <h2>Nenhuma área cadastrada ainda.</h2>
+        <h2 style="margin-top: 60px;">Nenhuma área cadastrada ainda.</h2>
     {% endif %}
 
 </body>
