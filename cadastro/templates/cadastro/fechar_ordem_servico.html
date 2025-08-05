@@ -179,11 +179,14 @@
         </form>
 
         {% if exibe_botao_download and os_id_fechada %}
-            <div class="button-container">
-                <a href="{% url 'baixar_autorizacao_desconto' os_id_fechada %}" class="btn btn-green">
-                    <i class="fas fa-file-download"></i> Baixar Autorização de Desconto
-                </a>
-            </div>
+        <div class="button-container">
+            <form action="{% url 'baixar_autorizacao_desconto' os_id=os_id_fechada %}" method="get" target="_blank" style="display: inline;">
+                <input type="hidden" name="parcelas" value="{{ parcelas_fechadas }}">
+                <button type="submit" class="btn btn-green">
+                    <i class="fas fa-download"></i> Baixar Autorização de Desconto
+                </button>
+            </form>
+        </div>
         {% endif %}
     </div>
 

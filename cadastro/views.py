@@ -236,38 +236,30 @@ def fechar_ordem_servico(request):
             ordem_servico.data_fechamento = timezone.now()
             ordem_servico.save()
 
-            # Redirecionar com dados via GET (sem usar sessão)
-            base_url = reverse('fechar_ordem_servico')
-            query_string = urlencode({
+            messages.success(request, f'Ordem de Serviço #{ordem_servico.id} fechada com sucesso!')
+
+            return render(request, 'cadastro/fechar_ordem_servico.html', {
+                'form': FechamentoOSForm(),  # limpa o formulário
+                'exibe_botao_download': bool(valor and valor > 0 and parcelas),
                 'os_id_fechada': ordem_servico.id,
-                'tem_valor': int(bool(valor and valor > 0 and parcelas))
+                'parcelas_fechadas': parcelas
             })
-            return HttpResponseRedirect(f'{base_url}?{query_string}')
         else:
             messages.error(request, 'Erro ao fechar a Ordem de Serviço. Verifique os dados.')
     else:
         form = FechamentoOSForm()
 
-    # Pegando dados via GET para exibir na tela após redirecionamento
-    os_id = request.GET.get('os_id_fechada')
-    tem_valor = request.GET.get('tem_valor') == '1'
-
-    if os_id:
-        messages.success(request, f'Ordem de Serviço #{os_id} fechada com sucesso!')
-
-    return render(request, 'cadastro/fechar_ordem_servico.html', {
-        'form': form,
-        'os_id_fechada': os_id,
-        'exibe_botao_download': tem_valor
-    })
+    return render(request, 'cadastro/fechar_ordem_servico.html', {'form': form})
 
 def baixar_autorizacao_desconto(request, os_id):
     ordem = get_object_or_404(OrdemServico, id=os_id)
     valor = ordem.valor
     cliente = ordem.cliente
 
-    # Defina o número de parcelas (exemplo: 1 ou salvar no banco, se preferir)
-    parcelas = 1  # ou recupere da sessão, se quiser manter flexível
+    try:
+        parcelas = int(request.GET.get('parcelas', 1))
+    except (ValueError, TypeError):
+        parcelas = 1
 
     return gerar_autorizacao_desconto(cliente, valor, parcelas)
 
