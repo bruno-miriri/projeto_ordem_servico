@@ -66,13 +66,14 @@ class ClienteForm(forms.ModelForm):
 class EquipamentoForm(forms.ModelForm):
     class Meta:
         model = Equipamento
-        fields = ['tipo', 'modelo', 'numero_serie', 'responsavel', 'status', 'area']
+        fields = ['tipo', 'modelo', 'numero_serie', 'responsavel', 'status', 'situacao', 'area']
         labels = {
             'tipo': 'Tipo do Equipamento',
             'modelo': 'Modelo',
             'numero_serie': 'Número de Série',
             'responsavel': 'Nome do Responsável',
             'status': 'Status',
+            'situacao': 'Situação',
             'area': 'Área',
         }
 

@@ -135,7 +135,16 @@
 
         {% for field in form %}
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
+
+            {% if field.name == 'situacao' %}
+                <select name="{{ field.name }}" id="{{ field.id_for_label }}">
+                    <option value="">--------</option>
+                    <option value="Novo" {% if field.value == 'Novo' %}selected{% endif %}>Novo</option>
+                    <option value="Usado" {% if field.value == 'Usado' %}selected{% endif %}>Usado</option>
+                </select>
+            {% else %}
+                {{ field }}
+            {% endif %}
 
             {% if field.name == 'numero_serie' %}
                 <div id="mensagem-numero-serie" class="mensagem-validacao" style="display: none;">
