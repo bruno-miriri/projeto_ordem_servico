@@ -66,12 +66,12 @@ class ClienteForm(forms.ModelForm):
 class EquipamentoForm(forms.ModelForm):
     class Meta:
         model = Equipamento
-        fields = ['tipo', 'modelo', 'numero_serie', 'responsavel', 'status', 'situacao', 'area']
+        fields = ['tipo', 'modelo', 'numero_serie', 'cliente', 'status', 'situacao', 'area']
         labels = {
             'tipo': 'Tipo do Equipamento',
             'modelo': 'Modelo',
             'numero_serie': 'Número de Série',
-            'responsavel': 'Nome do Responsável',
+            'cliente': 'Responsável',
             'status': 'Status',
             'situacao': 'Situação',
             'area': 'Área',
@@ -79,6 +79,8 @@ class EquipamentoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.fields['cliente'].label_from_instance = lambda obj: f"{obj.matricula} - {obj.nome}"
         self.fields['area'].label_from_instance = lambda obj: f"{obj.responsavel_area} - {obj.area}"
 
 class OrdemServicoForm(forms.Form):

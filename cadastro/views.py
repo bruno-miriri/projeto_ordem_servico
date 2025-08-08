@@ -13,7 +13,7 @@ from datetime import datetime
 from .notificacoes import enviar_email_os
 from io import BytesIO
 from django.views.decorators.csrf import csrf_exempt
-from .documentos import substituir_autorizacao_desconto, substituir_termo_entrega, substituir_termo_baixa
+from .documentos import substituir_autorizacao_desconto, substituir_termo_entrega, substituir_termo_baixa, substituir_termo_vinculo
 from django.urls import reverse
 from urllib.parse import urlencode
 from django.http import HttpResponseRedirect
@@ -111,15 +111,38 @@ def cadastrar_equipamento(request):
     if request.method == 'POST':
         form = EquipamentoForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Equipamento cadastrado com sucesso!')
-            return redirect('cadastrar_equipamento')
+            equipamento = form.save()
+
+            # Redireciona com dados via GET
+            base_url = reverse('cadastrar_equipamento')
+            query_string = urlencode({
+                'equipamento_id': equipamento.id,
+                'vinculado': 1
+            })
+            return HttpResponseRedirect(f"{base_url}?{query_string}")
         else:
             messages.error(request, 'Erro ao cadastrar equipamento. Verifique os dados.')
     else:
         form = EquipamentoForm()
 
-    return render(request, 'cadastro/cadastrar_equipamento.html', {'form': form})
+    equipamento = None
+    exibe_botao_download = False
+
+    if request.GET.get('vinculado') == '1':
+        try:
+            equipamento_id = int(request.GET.get('equipamento_id'))
+            equipamento = Equipamento.objects.get(id=equipamento_id)
+            exibe_botao_download = True
+            messages.success(request, f"Equipamento '{equipamento.modelo}' cadastrado com sucesso!")
+        except Exception:
+            messages.warning(request, 'Equipamento cadastrado, mas não foi possível preparar o termo.')
+
+    return render(request, 'cadastro/cadastrar_equipamento.html', {
+        'form': form,
+        'equipamento': equipamento,
+        'exibe_botao_download': exibe_botao_download
+    })
+
 
 
 def verificar_numero_serie(request):
@@ -356,6 +379,43 @@ def baixar_termo_baixa(request, cliente_id, equipamento_id):
         return redirect('registrar_baixa_equipamento')
 
     return gerar_termo_baixa(cliente, equipamento, baixa.motivo)
+
+def baixar_termo_vinculo(request, equipamento_id):
+    equipamento = get_object_or_404(Equipamento, id=equipamento_id)
+    cliente = equipamento.cliente  # Agora é um campo FK
+
+    dados = {
+        '{{data}}': datetime.now().strftime('%d/%m/%Y'),
+        '{{nome}}': cliente.nome,
+        '{{matricula}}': cliente.matricula,
+        '{{cpf}}': cliente.cpf,
+        '{{ugb}}': cliente.ugb,
+        '{{modelo}}': equipamento.modelo,
+        '{{numero_serie}}': equipamento.numero_serie,
+        '{{telefone}}': cliente.telefone,
+        '{{situacao}}': equipamento.situacao,
+    }
+
+    nome_arquivo = f"termo_vinculo_{cliente.matricula}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx"
+    caminho_modelo = os.path.join(settings.BASE_DIR, 'cadastro', 'documentos_modelo', 'termo_vinculo_cliente_modelo.docx')
+
+    doc = Document(caminho_modelo)
+
+    from .documentos import substituir_termo_vinculo
+    doc = substituir_termo_vinculo(doc, dados)
+
+    buffer = BytesIO()
+    doc.save(buffer)
+    buffer.seek(0)
+
+    response = HttpResponse(
+        buffer.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
+    return response
+
+
 
 
 def gerar_termo_baixa(cliente, equipamento, motivo):
