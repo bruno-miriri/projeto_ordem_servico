@@ -49,7 +49,7 @@ class Equipamento(models.Model):
     tipo = models.CharField(max_length=10, choices=TIPOS, db_column='tipo_equipamento')
     modelo = models.CharField(max_length=100)
     numero_serie = models.CharField(max_length=50)
-    responsavel = models.CharField(max_length=100)
+    cliente = models.ForeignKey('Cliente', on_delete=models.PROTECT, db_column='cliente_id')
     status = models.CharField(max_length=10, choices=STATUS)
     situacao = models.CharField(max_length=10, choices=SITUACAO)
     area = models.ForeignKey('Area', on_delete=models.PROTECT)

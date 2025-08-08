@@ -162,6 +162,14 @@
         </div>
     </form>
 
+    {% if exibe_botao_download and equipamento %}
+        <div class="form-actions">
+            <a href="{% url 'baixar_termo_vinculo' equipamento.id %}" class="btn" style="margin-top: 20px;">
+                <i class="fas fa-download"></i> Baixar Termo de Vínculo
+            </a>
+        </div>
+    {% endif %}
+
     <br>
     <a href="{% url 'menu_principal' %}" class="btn btn-back">
         <i class="fas fa-arrow-left"></i> Voltar ao Menu

@@ -35,6 +35,35 @@ def substituir_termo_baixa(doc, dados):
                 par.text = par.text.replace(chave, valor)
     return doc
 
+def substituir_termo_vinculo(doc, dados):
+    def substituir_em_paragrafo(par):
+        texto_completo = ''.join(run.text for run in par.runs)
+
+        if any(chave in texto_completo for chave in dados):
+            for chave in sorted(dados.keys(), key=len, reverse=True):
+                texto_completo = texto_completo.replace(chave, dados[chave])
+
+            # Remove todos os runs antigos
+            for i in reversed(range(len(par.runs))):
+                p_run = par.runs[i]._element
+                p_run.getparent().remove(p_run)
+
+            # Adiciona novo texto limpo
+            par.add_run(texto_completo)
+
+    # Substitui em parágrafos fora de tabelas
+    for par in doc.paragraphs:
+        substituir_em_paragrafo(par)
+
+    # Substitui em parágrafos dentro de tabelas
+    for tabela in doc.tables:
+        for linha in tabela.rows:
+            for celula in linha.cells:
+                for par in celula.paragraphs:
+                    substituir_em_paragrafo(par)
+
+    return doc
+
 def gerar_documento_download(modelo_nome, nome_arquivo_download, dados):
     caminho_modelo = os.path.join(settings.BASE_DIR, 'cadastro', 'documentos_modelo', modelo_nome)
     doc = Document(caminho_modelo)
@@ -45,6 +74,8 @@ def gerar_documento_download(modelo_nome, nome_arquivo_download, dados):
         doc = substituir_termo_entrega(doc, dados)
     elif 'termo_baixa' in modelo_nome:
         doc = substituir_termo_baixa(doc, dados)
+    elif 'termo_vinculo' in modelo_nome:
+        doc = substituir_termo_vinculo(doc, dados)
 
     buffer = BytesIO()
     doc.save(buffer)
