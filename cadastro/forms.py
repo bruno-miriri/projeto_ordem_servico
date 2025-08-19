@@ -113,7 +113,7 @@ class OrdemServicoForm(forms.Form):
         self.fields['cliente'].label_from_instance = lambda obj: f"{obj.matricula} - {obj.nome}"
 
         # Exibir equipamento como "modelo - responsável"
-        self.fields['equipamento'].label_from_instance = lambda obj: f"{obj.modelo} - {obj.responsavel}"
+        self.fields['equipamento'].label_from_instance = lambda obj: f"{obj.modelo} - {obj.cliente_id}"
 
 class FechamentoOSForm(forms.Form):
     os = forms.ModelChoiceField(
