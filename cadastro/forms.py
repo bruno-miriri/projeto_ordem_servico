@@ -146,7 +146,7 @@ class FechamentoOSForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['os'].label_from_instance = lambda obj: (
-            f"{obj.id} - {obj.equipamento.modelo} - {obj.equipamento.responsavel}"
+            f"{obj.id} - {obj.equipamento.modelo} - {obj.equipamento.cliente_id}"
         )
 
     def clean(self):
