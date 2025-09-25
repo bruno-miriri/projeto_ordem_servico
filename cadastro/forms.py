@@ -18,6 +18,8 @@ class AreaForm(forms.ModelForm):
 class ClienteForm(forms.ModelForm):
     nome = forms.CharField(required=False)
     cpf = forms.CharField(required=False)
+    telefone = forms.CharField(required=False)
+    email = forms.CharField(required=False)
 
     class Meta:
         model = Cliente

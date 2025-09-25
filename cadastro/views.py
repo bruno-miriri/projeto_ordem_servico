@@ -143,6 +143,17 @@ def cadastrar_equipamento(request):
         'exibe_botao_download': exibe_botao_download
     })
 
+def listar_equipamentos_alocados(request):
+    equipamentos = (
+        Equipamento.objects
+        .select_related('cliente', 'area')
+        .filter(cliente__isnull=False)  # já vinculados
+        # .filter(status='Ativo')       # opcional: só ativos
+        .order_by('cliente__nome', 'modelo')
+    )
+    return render(request, 'cadastro/termos_equipamentos.html', {
+        'equipamentos': equipamentos
+    })
 
 
 def verificar_numero_serie(request):
@@ -442,3 +453,34 @@ def gerar_termo_baixa(cliente, equipamento, motivo):
     )
     response['Content-Disposition'] = f'attachment; filename="{nome_arquivo}"'
     return response
+
+def listar_os_para_termos(request):
+    os_list = (
+        OrdemServico.objects
+        .select_related('cliente', 'equipamento', 'equipamento__area')
+        .order_by('-id')
+    )
+    return render(request, 'cadastro/termos_os.html', {'os_list': os_list})
+
+def baixar_termo_entrega_por_equipamento(request, equipamento_id):
+    equipamento = get_object_or_404(Equipamento, id=equipamento_id)
+    cliente = equipamento.cliente
+
+    # Se quiser, busque CPF mais recente no Oracle como já faz em download_termo_entrega:
+    resultado = consultar_oracle_por_matricula(cliente.empresa, cliente.matricula)  # reaproveita função
+    cpf = resultado[1] if resultado else cliente.cpf
+
+    dados = {
+        '{{data}}': datetime.now().strftime('%d/%m/%Y'),
+        '{{nome}}': cliente.nome,
+        '{{matricula}}': cliente.matricula,
+        '{{cpf}}': cpf,
+        '{{modelo}}': equipamento.modelo,
+        '{{numero_serie}}': equipamento.numero_serie,
+        '{{area}}': equipamento.area.area,
+        '{{responsavel_area}}': equipamento.area.responsavel_area,
+    }
+
+    from .documentos import gerar_documento_download
+    nome_arquivo = f"termo_entrega_{cliente.matricula}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx"
+    return gerar_documento_download('termo_responsabilidade_modelo.docx', nome_arquivo, dados)

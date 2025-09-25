@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Termos — Equipamentos Alocados</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e8f5e9;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-bottom: 30px;
+        }
+
+        .alert {
+            margin: 15px auto;
+            padding: 12px;
+            border-radius: 5px;
+            color: white;
+            max-width: 1000px;
+            text-align: left;
+        }
+
+        .alert-success { background-color: #4caf50; }
+        .alert-error { background-color: #f44336; }
+        .alert-warning { background-color: #f9a825; color:#333; }
+
+        .content-card {
+            background-color: #ffffff;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #ccc;
+            display: inline-block;
+            text-align: left;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+
+        thead th {
+            background-color: #43a047;
+            color: #fff;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        tbody td {
+            border-bottom: 1px solid #eee;
+            padding: 10px 12px;
+            color: #333;
+        }
+
+        tr:hover td {
+            background-color: #f3f9f4;
+        }
+
+        .actions {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #43a047;
+            color: white;
+            padding: 10px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover { background-color: #388e3c; }
+
+        .btn-back {
+            background-color: #757575;
+            margin-top: 20px;
+        }
+
+        .btn-back:hover { background-color: #5f5f5f; }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .search-input {
+            width: 280px;
+            padding: 10px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .muted { color:#666; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <img src="{% static 'logo.png' %}" alt="Logo da Miriri" class="logo">
+    <h1>Termos — Equipamentos Alocados</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="content-card">
+        <div class="header-actions">
+            <div class="muted">
+                <i class="fa-solid fa-circle-info"></i>
+                Clique no botão “Baixar Termo de Vínculo” para gerar o documento do equipamento vinculado ao cliente.
+            </div>
+            <input type="text" id="filtro" class="search-input" placeholder="Filtrar por cliente, matrícula ou modelo...">
+        </div>
+
+        <div class="table-wrapper">
+            <table id="tabela-equipamentos">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Matrícula</th>
+                        <th>Modelo</th>
+                        <th>Nº Série</th>
+                        <th>Área</th>
+                        <th style="width: 220px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in equipamentos %}
+                        <tr>
+                            <td>{{ e.cliente.nome }}</td>
+                            <td>{{ e.cliente.matricula }}</td>
+                            <td>{{ e.modelo }}</td>
+                            <td>{{ e.numero_serie }}</td>
+                            <td>{{ e.area.responsavel_area }} - {{ e.area.area }}</td>
+                            <td>
+                                <div class="actions">
+                                    <a class="btn" href="{% url 'baixar_termo_vinculo' e.id %}">
+                                        <i class="fa-solid fa-file-arrow-down"></i>
+                                        Baixar Termo de Vínculo
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6">Nenhum equipamento vinculado encontrado.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a href="{% url 'menu_principal' %}" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar ao Menu
+        </a>
+    </div>
+
+    <script>
+        // Filtro simples no front-end (cliente, matrícula, modelo, série, área)
+        (function(){
+            const filtro = document.getElementById('filtro');
+            const linhas = () => Array.from(document.querySelectorAll('#tabela-equipamentos tbody tr'));
+
+            filtro.addEventListener('input', function() {
+                const q = this.value.toLowerCase();
+                linhas().forEach(tr => {
+                    const texto = tr.innerText.toLowerCase();
+                    tr.style.display = texto.includes(q) ? '' : 'none';
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
