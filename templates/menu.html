@@ -115,23 +115,22 @@
             <i class="fas fa-file-alt"></i>
             Cadastro de OS
         </a>
-
+        <a href="{% url 'listar_equipamentos_alocados' %}" class="menu-button">
+            <i class="fas fa-file-signature"></i>
+             Termos — Equipamentos
+        </a>
+        <a href="{% url 'listar_os_para_termos' %}" class="menu-button">
+            <i class="fas fa-file-signature"></i>
+            Termos — OS</a>
         <a href="{% url 'fechar_ordem_servico' %}" class="menu-button red">
             <i class="fas fa-check-circle"></i>
             Fechamento de OS
         </a>
-
         <a href="{% url 'registrar_baixa_equipamento' %}" class="menu-button yellow">
             <i class="fas fa-box-open"></i>
             Baixa de Equipamento
         </a>
-        <a href="{% url 'listar_equipamentos_alocados' %}" class="menu-button">
-            <i class="fas fa-laptop"></i>
-             Termos — Equipamentos
-        </a>
-        <a href="{% url 'listar_os_para_termos' %}" class="menu-button">
-            <i class="fas fa-laptop"></i>
-            Termos — OS</a>
+        
     </div>
 
 </body>
